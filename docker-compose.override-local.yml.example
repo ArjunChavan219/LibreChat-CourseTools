@@ -1,0 +1,28 @@
+version: "3.4"
+
+services:
+  api:
+    image: librechat-local
+    build:
+      context: .
+      dockerfile: Dockerfile.multi
+    ports:
+      - "3080:3080"
+    environment:
+      - NODE_ENV=production
+      - HOST=0.0.0.0
+      - MONGO_URI=mongodb://mongodb:27017/LibreChat
+    depends_on:
+      - mongodb
+    env_file:
+      - .env
+
+  mongodb:
+    image: mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+volumes:
+  mongo-data:
