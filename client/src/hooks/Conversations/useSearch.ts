@@ -8,7 +8,7 @@ import { useSearchInfiniteQuery } from '~/data-provider';
 import useConversation from './useConversation';
 import store from '~/store';
 
-export default function useSearchMessages({ isAuthenticated }: { isAuthenticated: boolean }) {
+export default function useSearchMessages({ isAuthenticated, courseId }: { isAuthenticated: boolean, courseId: string }) {
   const navigate = useNavigate();
   const location = useLocation();
   const [pageNumber, setPageNumber] = useState(1);
@@ -19,7 +19,7 @@ export default function useSearchMessages({ isAuthenticated }: { isAuthenticated
 
   const searchEnabledQuery = useGetSearchEnabledQuery({ enabled: isAuthenticated });
   const searchQueryRes = useSearchInfiniteQuery(
-    { pageNumber: pageNumber.toString(), searchQuery: searchQuery, isArchived: false },
+    { pageNumber: pageNumber.toString(), courseId, searchQuery: searchQuery, isArchived: false },
     { enabled: isAuthenticated && !!searchQuery.length },
   ) as UseInfiniteQueryResult<ConversationListResponse, unknown> | undefined;
 

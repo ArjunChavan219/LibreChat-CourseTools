@@ -81,6 +81,16 @@ const userSchema = mongoose.Schema(
       type: String,
       default: SystemRoles.USER,
     },
+    profileId: {
+      type: mongoose.Schema.Types.ObjectId, 
+      refPath: 'role',
+      required: true 
+    },
+    profileRole: {
+      type: String, 
+      refPath: 'role',
+      required: true 
+    },
     googleId: {
       type: String,
       unique: true,

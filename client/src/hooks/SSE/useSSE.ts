@@ -37,7 +37,8 @@ export default function useSSE(
   const genTitle = useGenTitleMutation();
   const setActiveRunId = useSetRecoilState(store.activeRunFamily(runIndex));
 
-  const { token, isAuthenticated } = useAuthContext();
+  const { token, isAuthenticated, courseId } = useAuthContext();
+  
   const [completed, setCompleted] = useState(new Set());
   const setAbortScroll = useSetRecoilState(store.abortScrollFamily(runIndex));
   const setShowStopButton = useSetRecoilState(store.showStopButtonByIndex(runIndex));
@@ -84,13 +85,16 @@ export default function useSSE(
     }
 
     let { userMessage } = submission;
-
+    
     const payloadData = createPayload(submission);
     let { payload } = payloadData;
     if (isAssistantsEndpoint(payload.endpoint) || isAgentsEndpoint(payload.endpoint)) {
       payload = removeNullishValues(payload);
     }
+    payload.courseId = courseId || "1";
 
+    console.log(payload);
+    
     let textIndex = null;
 
     const events = new SSE(payloadData.server, {

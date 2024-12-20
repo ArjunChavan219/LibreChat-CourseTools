@@ -1,9 +1,9 @@
 <p align="center">
-  <a href="https://librechat.ai">
+  <a href="https://github.com/ArjunChavan219/LibreChat-CourseTools">
     <img src="client/public/assets/logo.svg" height="256">
   </a>
   <h1 align="center">
-    <a href="https://librechat.ai">LibreChat</a>
+    <a href="https://github.com/ArjunChavan219/LibreChat-CourseTools">LibreChat CourseTools</a>
   </h1>
 </p>
 
@@ -16,129 +16,155 @@
     <img
       src="https://img.shields.io/badge/YOUTUBE-red.svg?style=for-the-badge&logo=youtube&logoColor=white&labelColor=000000&logoWidth=20">
   </a>
-  <a href="https://docs.librechat.ai"> 
-    <img
-      src="https://img.shields.io/badge/DOCS-blue.svg?style=for-the-badge&logo=read-the-docs&logoColor=white&labelColor=000000&logoWidth=20">
-  </a>
-  <a aria-label="Sponsors" href="https://github.com/sponsors/danny-avila">
-    <img
-      src="https://img.shields.io/badge/SPONSORS-brightgreen.svg?style=for-the-badge&logo=github-sponsors&logoColor=white&labelColor=000000&logoWidth=20">
-  </a>
-</p>
-
-<p align="center">
-<a href="https://railway.app/template/b5k2mn?referralCode=HI9hWz">
-  <img src="https://railway.app/button.svg" alt="Deploy on Railway" height="30">
-</a>
-<a href="https://zeabur.com/templates/0X2ZY8">
-  <img src="https://zeabur.com/button.svg" alt="Deploy on Zeabur" height="30"/>
-</a>
-<a href="https://template.cloud.sealos.io/deploy?templateName=librechat">
-  <img src="https://raw.githubusercontent.com/labring-actions/templates/main/Deploy-on-Sealos.svg" alt="Deploy on Sealos" height="30">
-</a>
-</p>
-
-# 📃 Features
-
-- 🖥️ UI matching ChatGPT, including Dark mode, Streaming, and latest updates
-- 🤖 AI model selection:
-  - OpenAI, Azure OpenAI, BingAI, ChatGPT, Google Vertex AI, Anthropic (Claude), Plugins, Assistants API (including Azure Assistants)
-- ✅ Compatible across both **[Remote & Local AI services](https://www.librechat.ai/docs/configuration/librechat_yaml/ai_endpoints):**
-  - groq, Ollama, Cohere, Mistral AI, Apple MLX, koboldcpp, OpenRouter, together.ai, Perplexity, ShuttleAI, and more
-- 🪄 Generative UI with [Code Artifacts](https://youtu.be/GfTj7O4gmd0?si=WJbdnemZpJzBrJo3)
-   - Create React, HTML code, and Mermaid diagrams right in chat
-- 💾 Create, Save, & Share Custom Presets
-- 🔀 Switch between AI Endpoints and Presets, mid-chat
-- 🔄 Edit, Resubmit, and Continue Messages with Conversation branching
-- 🌿 Fork Messages & Conversations for Advanced Context control
-- 💬 Multimodal Chat:
-    - Upload and analyze images with Claude 3, GPT-4 (including `gpt-4o` and `gpt-4o-mini`), and Gemini Vision 📸
-    - Chat with Files using Custom Endpoints, OpenAI, Azure, Anthropic, & Google. 🗃️
-    - Advanced Agents with Files, Code Interpreter, Tools, and API Actions 🔦
-      - Available through the [OpenAI Assistants API](https://platform.openai.com/docs/assistants/overview) 🌤️
-      - Non-OpenAI Agents in Active Development 🚧
-- 🌎 Multilingual UI:
-  - English, 中文, Deutsch, Español, Français, Italiano, Polski, Português Brasileiro,
-  - Русский, 日本語, Svenska, 한국어, Tiếng Việt, 繁體中文, العربية, Türkçe, Nederlands, עברית
-- 🎨 Customizable Dropdown & Interface: Adapts to both power users and newcomers
-- 📧 Verify your email to ensure secure access
-- 🗣️ Chat hands-free with Speech-to-Text and Text-to-Speech magic
-  - Automatically send and play Audio
-  - Supports OpenAI, Azure OpenAI, and Elevenlabs
-- 📥 Import Conversations from LibreChat, ChatGPT, Chatbot UI
-- 📤 Export conversations as screenshots, markdown, text, json
-- 🔍 Search all messages/conversations
-- 🔌 Plugins, including web access, image generation with DALL-E-3 and more
-- 👥 Multi-User, Secure Authentication with Moderation and Token spend tools
-- ⚙️ Configure Proxy, Reverse Proxy, Docker, & many Deployment options:
-  - Use completely local or deploy on the cloud
-- 📖 Completely Open-Source & Built in Public
-- 🧑‍🤝‍🧑 Community-driven development, support, and feedback
-
-[For a thorough review of our features, see our docs here](https://docs.librechat.ai/) 📚
-
-## 🪶 All-In-One AI Conversations with LibreChat
-
-LibreChat brings together the future of assistant AIs with the revolutionary technology of OpenAI's ChatGPT. Celebrating the original styling, LibreChat gives you the ability to integrate multiple AI models. It also integrates and enhances original client features such as conversation and message search, prompt templates and plugins.
-
-With LibreChat, you no longer need to opt for ChatGPT Plus and can instead use free or pay-per-call APIs. We welcome contributions, cloning, and forking to enhance the capabilities of this advanced chatbot platform.
-
-[![Watch the video](https://raw.githubusercontent.com/LibreChat-AI/librechat.ai/main/public/images/changelog/v0.7.4.png)](https://www.youtube.com/watch?v=cvosUxogdpI)
-Click on the thumbnail to open the video☝️
-
----
-
-## 🌐 Resources
-
-**GitHub Repo:**
-  - **RAG API:** [github.com/danny-avila/rag_api](https://github.com/danny-avila/rag_api)
-  - **Website:** [github.com/LibreChat-AI/librechat.ai](https://github.com/LibreChat-AI/librechat.ai)
-
-**Other:**
-  - **Website:** [librechat.ai](https://librechat.ai)
-  - **Documentation:** [docs.librechat.ai](https://docs.librechat.ai)
-  - **Blog:** [blog.librechat.ai](https://docs.librechat.ai)
-
----
-
-## 📝 Changelog
-
-Keep up with the latest updates by visiting the releases page and notes:
-- [Releases](https://github.com/danny-avila/LibreChat/releases)
-- [Changelog](https://www.librechat.ai/changelog) 
-
-**⚠️ Please consult the [changelog](https://www.librechat.ai/changelog) for breaking changes before updating.**
-
----
-
-## ⭐ Star History
-
-<p align="center">
-  <a href="https://star-history.com/#danny-avila/LibreChat&Date">
-    <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=danny-avila/LibreChat&type=Date&theme=dark" onerror="this.src='https://api.star-history.com/svg?repos=danny-avila/LibreChat&type=Date'" />
-  </a>
-</p>
-<p align="center">
-  <a href="https://trendshift.io/repositories/4685" target="_blank" style="padding: 10px;">
-    <img src="https://trendshift.io/api/badge/repositories/4685" alt="danny-avila%2FLibreChat | Trendshift" style="width: 250px; height: 55px;" width="250" height="55"/>
-  </a>
-  <a href="https://runacap.com/ross-index/q1-24/" target="_blank" rel="noopener" style="margin-left: 20px;">
-    <img style="width: 260px; height: 56px" src="https://runacap.com/wp-content/uploads/2024/04/ROSS_badge_white_Q1_2024.svg" alt="ROSS Index - Fastest Growing Open-Source Startups in Q1 2024 | Runa Capital" width="260" height="56"/>
-  </a>
 </p>
 
 ---
 
-## ✨ Contributions
+# 📃 About LibreChat CourseTools
 
-Contributions, suggestions, bug reports and fixes are welcome!
+**LibreChat CourseTools** is a customized version of the LibreChat platform, designed to enhance its capabilities for course management in educational settings. This version integrates tools for **professors, students, and teaching assistants (TAs)**, enabling:
 
-For new features, components, or extensions, please open an issue and discuss before sending a PR.
+- **Roster Management**: Add, update, and remove students and TAs within courses.
+- **Role-Based Chat Access**: 
+  - Professors can view and manage course chats.
+  - TAs can assist students and manage rosters.
+  - Students can engage in course-specific chats.
+- **Seamless Authentication**: The system automatically assigns users to respective roles (Professor/Student/TA) based on their profiles.
+- **Enhanced Modals and Forms**: Custom modals for adding courses, students, and TAs with a professional and accessible UI.
+
+This fork builds upon the core features of LibreChat, with a focus on education-based enhancements while retaining the ability to integrate with popular AI models like OpenAI, Claude, and more.
 
 ---
 
-## 💖 This project exists in its current state thanks to all the people who contribute
+# 📂 Features
 
-<a href="https://github.com/danny-avila/LibreChat/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=danny-avila/LibreChat" />
-</a>
+- 🛠️ **Course Management Tools**
+  - Professors can create courses with descriptions and IDs.
+  - Teaching Assistants can manage rosters and participate in course chats.
+  - Students can join courses and access chats based on enrollment.
+
+- 💬 **Enhanced Chat Functionalities**
+  - Course-specific chats for students, TAs, and professors.
+  - Course-based chat rendering using `AuthContext`.
+
+- 🎨 **Custom Professional UI**
+  - Redesigned modals, tables, and layouts for managing rosters and courses.
+
+- 📖 **Documentation & Deployment**
+  - Local development setup and Docker-based deployment for seamless integration.
+
+---
+
+# 🚀 Deployment Instructions
+## 🔒 Controlled Registration and Role Assignment
+
+To ensure secure and managed access to the platform:
+
+- **Invite-Only Registration**: 
+  - Users must have an invite link to register.
+  - Invited users are automatically added to the system as **Students** (default user role).
+
+- **Admin Account Creation**:
+  - To register as a **Professor (Admin)**, an **Admin Token** is required.
+  - The Admin Token can be configured dynamically in the `.env` file under the key `ADMIN_TOKEN`.
+  
+### Configuration Example
+
+Update your `.env` file:
+
+```plaintext
+# Admin Token for professor account creation
+ADMIN_TOKEN=your-secure-admin-token
+```
+
+### Workflow
+
+1. **Students**:
+   - Register using an invite link provided by the course admin or system.
+   - Automatically assigned the role `Student`.
+
+2. **Professors (Admins)**:
+   - During registration, provide the `ADMIN_TOKEN` in the url to create a **Professor** account.
+   - Without the valid token, the user cannot register as a Professor.
+   - Refer to .env.example file for more context.
+
+This ensures role-based access control and prevents unauthorized account creation.
+
+
+## Development
+
+The project is divided into three layers:
+1. **Data Layer**: `/data-provider`
+   ```bash
+   cd packages/data-provider
+   npm run build
+   ```
+2. **Frontend**: `/client`
+   ```bash
+   cd client
+   npm run dev
+   ```
+3. **Backend**: `/api` (But executed from root)
+   ```bash
+   npm run backend:dev
+   ```
+
+Visit `http://localhost:3090` for the local instance.
+
+## Docker Deployment
+
+1. Build the image:
+   ```bash
+   docker build -t librechat-local -f Dockerfile.multi .
+   ```
+
+2. Start the containers:
+   ```bash
+   docker-compose up --build -d
+   ```
+
+3. To reset volumes and start fresh:
+   ```bash
+   docker-compose down -v
+   docker-compose up --build -d
+   ```
+
+3. Visit `http://localhost:3080` to access the platform.
+
+---
+
+# 🛠️ Development Highlights
+
+- **Authentication**:
+  - Integrated `AuthContext` to handle user roles dynamically (Student, Professor, TA).
+  - Reused the existing routing logic with tailored component rendering.
+
+- **Course Management**:
+  - Developed APIs to manage courses, rosters, and role-specific operations.
+  - Populated MongoDB collections for professors, students, and TAs, with associations using Mongoose.
+
+- **UI Enhancements**:
+  - Redesigned professional modals and forms for an intuitive user experience.
+  - Focused on accessibility and responsiveness for educators and learners.
+
+---
+
+# 🌐 Resources
+
+- **Original LibreChat**: [LibreChat Repo](https://github.com/danny-avila/LibreChat)
+- **Documentation**: [LibreChat Docs](https://docs.librechat.ai)
+- **Forked Repository**: [LibreChat-CourseTools](https://github.com/ArjunChavan219/LibreChat-CourseTools)
+
+---
+
+# 📝 Contributions
+
+Contributions are welcome! If you have ideas for further enhancing the CourseTools features, feel free to:
+- Open an issue
+- Fork the repo and send a pull request
+
+---
+
+# 💖 Acknowledgments
+
+This project is built on top of the open-source LibreChat platform.

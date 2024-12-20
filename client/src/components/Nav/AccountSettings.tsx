@@ -14,9 +14,11 @@ import NavLink from './NavLink';
 import Logout from './Logout';
 import { cn } from '~/utils/';
 import store from '~/store';
+import { useNavigate } from 'react-router-dom';
 
 function AccountSettings() {
   const localize = useLocalize();
+  const navigate = useNavigate();
   const { user, isAuthenticated } = useAuthContext();
   const { data: startupConfig } = useGetStartupConfig();
   const balanceQuery = useGetUserBalance({
@@ -92,6 +94,23 @@ function AccountSettings() {
                     <div className="my-1.5 h-px border-b border-border-medium" role="none" />
                   </>
                 )}
+                <MenuItem>
+                  {({ focus }) => (
+                    <NavLink
+                      className={focus ? 'bg-surface-hover' : ''}
+                      svg={() => <></>}
+                      text={'Home'}
+                      clickHandler={() => {
+                        if (user?.role == "instructor") {
+                          navigate('/instructor');
+                        } else {
+                          navigate('/student');
+                        }
+                      }
+                    }
+                    />
+                  )}
+                </MenuItem>
                 <MenuItem>
                   {({ focus }) => (
                     <NavLink

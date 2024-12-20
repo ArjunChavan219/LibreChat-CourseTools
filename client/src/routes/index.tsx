@@ -16,6 +16,7 @@ import ChatRoute from './ChatRoute';
 import Search from './Search';
 import Root from './Root';
 
+
 const AuthLayout = () => (
   <AuthContextProvider>
     <Outlet />

@@ -5,6 +5,7 @@ import type { TLoginUser, TStartupConfig } from 'librechat-data-provider';
 import type { TAuthContext } from '~/common';
 import { useResendVerificationEmail } from '~/data-provider';
 import { useLocalize } from '~/hooks';
+import { useLocation } from 'react-router-dom';
 
 type TLoginFormProps = {
   onSubmit: (data: TLoginUser) => void;
@@ -25,6 +26,9 @@ const LoginForm: React.FC<TLoginFormProps> = ({ onSubmit, startupConfig, error, 
 
   const { data: config } = useGetStartupConfig();
   const useUsernameLogin = config?.ldap?.username;
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const courseToken = queryParams.get('courseToken');  
 
   useEffect(() => {
     if (error && error.includes('422') && !showResendLink) {
@@ -79,7 +83,13 @@ const LoginForm: React.FC<TLoginFormProps> = ({ onSubmit, startupConfig, error, 
         className="mt-6"
         aria-label="Login form"
         method="POST"
-        onSubmit={handleSubmit((data) => onSubmit(data))}
+        onSubmit={handleSubmit((data) => {
+          if (courseToken) {
+            data.courseToken = courseToken;
+          }
+          console.log(data);
+          return onSubmit(data);
+        })}
       >
         <div className="mb-2">
           <div className="relative">

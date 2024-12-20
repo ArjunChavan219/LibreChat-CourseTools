@@ -37,6 +37,13 @@ export function getMessagesByConvoId(conversationId: string): Promise<s.TMessage
   return request.get(endpoints.messages(conversationId));
 }
 
+export function getStudentMessagesByConvoId(conversationId: string, studentId: string): Promise<s.TMessage[]> {
+  if (conversationId === 'new') {
+    return Promise.resolve([]);
+  }
+  return request.get(endpoints.studentMessages(conversationId, studentId));
+}
+
 export function getSharedMessages(shareId: string): Promise<t.TSharedMessagesResponse> {
   return request.get(endpoints.shareMessages(shareId));
 }
@@ -65,7 +72,7 @@ export function deleteSharedLink(shareId: string): Promise<t.TDeleteSharedLinkRe
   return request.delete(endpoints.shareMessages(shareId));
 }
 
-export function updateMessage(payload: t.TUpdateMessageRequest): Promise<unknown> {
+export function updateMessage(payload: t.TUpdateMessageRequest): Promise<unknown> {  
   const { conversationId, messageId, text } = payload;
   if (!conversationId) {
     throw new Error('conversationId is required');
@@ -520,21 +527,36 @@ export const listConversations = (
 ): Promise<q.ConversationListResponse> => {
   // Assuming params has a pageNumber property
   const pageNumber = params?.pageNumber || '1'; // Default to page 1 if not provided
+  const courseId = params?.courseId || '1';
   const isArchived = params?.isArchived || false; // Default to false if not provided
   const tags = params?.tags || []; // Default to an empty array if not provided
-  return request.get(endpoints.conversations(pageNumber, isArchived, tags));
+  return request.get(endpoints.conversations(pageNumber, courseId, isArchived, tags));
+};
+
+export const listStudentConversations = (
+  params?: q.StudentConversationListParams,
+): Promise<q.ConversationListResponse> => {
+  // Assuming params has a pageNumber property
+  
+  const studentId = params?.studentId || '1';
+  const pageNumber = params?.pageNumber || '1'; // Default to page 1 if not provided
+  const courseId = params?.courseId || '1';
+  const isArchived = params?.isArchived || false; // Default to false if not provided
+  const tags = params?.tags || []; // Default to an empty array if not provided
+  return request.get(endpoints.studentConversations(studentId, pageNumber, courseId, isArchived, tags));
 };
 
 export const listConversationsByQuery = (
   params?: q.ConversationListParams & { searchQuery?: string },
 ): Promise<q.ConversationListResponse> => {
   const pageNumber = params?.pageNumber || '1'; // Default to page 1 if not provided
+  const courseId = params?.courseId || '1';
   const searchQuery = params?.searchQuery || ''; // If no search query is provided, default to an empty string
   // Update the endpoint to handle a search query
   if (searchQuery !== '') {
     return request.get(endpoints.search(searchQuery, pageNumber));
   } else {
-    return request.get(endpoints.conversations(pageNumber));
+    return request.get(endpoints.conversations(pageNumber, courseId));
   }
 };
 
@@ -545,8 +567,8 @@ export const searchConversations = async (
   return request.get(endpoints.search(q, pageNumber));
 };
 
-export function getConversations(pageNumber: string): Promise<t.TGetConversationsResponse> {
-  return request.get(endpoints.conversations(pageNumber));
+export function getConversations(pageNumber: string, courseId: string): Promise<t.TGetConversationsResponse> {
+  return request.get(endpoints.conversations(pageNumber, courseId));
 }
 
 export function getConversationById(id: string): Promise<s.TConversation> {
@@ -681,4 +703,138 @@ export function getUserTerms(): Promise<t.TUserTermsResponse> {
 
 export function acceptTerms(): Promise<t.TAcceptTermsResponse> {
   return request.post(endpoints.acceptUserTerms());
+}
+
+
+/* Course Tools APIs*/
+export async function checkTokenValidity(courseToken: string): Promise<t.TTokenValidityResponse> {
+  const response = await fetch(`/api/courses/check-token?token=${courseToken}`, {
+    method: 'GET',
+    headers: { 'Content-Type': 'application/json' }
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch data');
+  }
+
+  const data: t.TTokenValidityResponse = await response.json();
+
+  if (data.message !== 'Token is valid') {
+    throw new Error(data.message);
+  }
+
+  return data;
+}
+
+export async function fetchCoursesByProfessorId(professorId: string | undefined): Promise<any[]> {
+  if (!professorId) {
+      throw new Error("Professor ID is undefined");
+  }
+  const response = await fetch(`/api/professors/${professorId}/courses`);
+  if (!response.ok) {
+      throw new Error(`Failed to fetch courses: ${response.statusText}`);
+  }
+  return await response.json();
+}
+
+// Function to post a new course
+export async function addCourse(professorId: string | undefined, course: { name: string; description: string; id: string }): Promise<t.TCourse> {
+  if (!professorId) {
+      throw new Error("Professor ID is undefined");
+  }
+  const response = await fetch(`/api/professors/${professorId}/courses`, {
+      method: 'POST',
+      headers: {
+          'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(course),
+  });
+
+  if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Failed to add course');
+  }
+
+  return await response.json();
+}
+
+export async function generateInviteLink(courseId: string): Promise<string> {
+  const response = await fetch(`/api/courses/${courseId}/generate-link`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+  });
+
+  if (!response.ok) {
+      throw new Error('Failed to generate invite link');
+  }
+
+  const { token } = await response.json();
+  return token;
+}
+
+export async function addStudentToCourse(params: t.TAddStudentToCourseParams): Promise<any> {
+  const { courseId, studentId, isTA } = params;
+  const response = await fetch(`/api/courses/${courseId}/students/${studentId}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ isTA }),
+  });
+
+  if (!response.ok) {
+      throw new Error(`Failed to add ${isTA ? 'TA' : 'Student'}`);
+  }
+
+  return await response.json();
+}
+
+export async function changeStudentRole({ courseId, studentId, newRole }: { courseId: string; studentId: string; newRole: 'Student' | 'TA' }): Promise<any> {
+  const response = await fetch(`/api/courses/${courseId}/students/${studentId}/role`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ newRole }),
+  });
+
+  if (!response.ok) {
+      throw new Error('Failed to update student role');
+  }
+
+  return await response.json();
+}
+
+export async function removeStudentFromCourse({ courseId, studentId, isTA }: { courseId: string; studentId: string; isTA: boolean }): Promise<any> {
+  const response = await fetch(`/api/courses/${courseId}/students/${studentId}`, {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ isTA }),
+  });
+
+  if (!response.ok) {
+      throw new Error(`Failed to remove ${isTA ? 'TA' : 'Student'}`);
+  }
+
+  return await response.json();
+}
+
+export async function fetchRoster(courseId: string): Promise<{ students: any[], tas: any[] }> {
+  const response = await fetch(`/api/courses/${courseId}/students`);
+  if (!response.ok) {
+      throw new Error(`Failed to fetch roster: ${response.statusText}`);
+  }
+  return await response.json();
+}
+
+export async function fetchNewStudents(courseId: string): Promise<t.TStudent[]> {
+  const response = await fetch(`/api/courses/${courseId}/new-students`);
+  if (!response.ok) {
+      throw new Error(`Failed to fetch new students: ${response.statusText}`);
+  }
+  return await response.json();
+}
+
+export async function fetchCourses(userId: string): Promise<{studentCourses: any[], taCourses: any[]}> {
+  const response = await fetch(`/api/student/${userId}/courses`);
+  if (!response.ok) {
+      throw new Error('Failed to fetch courses');
+  }
+  return await response.json();
 }

@@ -16,7 +16,7 @@ export type TMessageActions = Pick<
 };
 export default function useMessageActions(props: TMessageActions) {
   const localize = useLocalize();
-  const { user } = useAuthContext();
+  const { user, studentName } = useAuthContext();
   const UsernameDisplay = useRecoilValue<boolean>(store.UsernameDisplay);
   const { message, currentEditId, setCurrentEditId, isMultiMessage } = props;
 
@@ -70,16 +70,19 @@ export default function useMessageActions(props: TMessageActions) {
   }, [isSubmitting, isCreatedByUser, message, regenerate]);
 
   const copyToClipboard = useCopyToClipboard({ text, content });
-
+  
   const messageLabel = useMemo(() => {
     if (message?.isCreatedByUser === true) {
+      if (studentName) {
+        return studentName;
+      }
       return UsernameDisplay ? (user?.name ?? '') || user?.username : localize('com_user_message');
     } else if (assistant) {
       return assistant.name ?? 'Assistant';
     } else {
       return message?.sender;
     }
-  }, [message, assistant, UsernameDisplay, user, localize]);
+  }, [message, assistant, UsernameDisplay, user, studentName, localize]);
 
   return {
     ask,

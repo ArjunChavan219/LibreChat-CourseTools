@@ -12,6 +12,9 @@ export const deleteUser = () => '/api/user/delete';
 export const messages = (conversationId: string, messageId?: string) =>
   `/api/messages/${conversationId}${messageId ? `/${messageId}` : ''}`;
 
+export const studentMessages = (conversationId: string, studentId: string) =>
+  `/api/messages/${conversationId}?studentId=${studentId}`;
+
 const shareRoot = '/api/share';
 export const shareMessages = (shareId: string) => `${shareRoot}/${shareId}`;
 export const getSharedLinks = (pageNumber: string, isPublic: boolean) =>
@@ -33,8 +36,13 @@ export const abortRequest = (endpoint: string) => `/api/ask/${endpoint}/abort`;
 
 export const conversationsRoot = '/api/convos';
 
-export const conversations = (pageNumber: string, isArchived?: boolean, tags?: string[]) =>
-  `${conversationsRoot}?pageNumber=${pageNumber}${isArchived ? '&isArchived=true' : ''}${tags
+export const conversations = (pageNumber: string, courseId: string, isArchived?: boolean, tags?: string[]) =>
+  `${conversationsRoot}?pageNumber=${pageNumber}&courseId=${courseId}${isArchived ? '&isArchived=true' : ''}${tags
+    ?.map((tag) => `&tags=${tag}`)
+    .join('')}`;
+
+export const studentConversations = (studentId: string, pageNumber: string, courseId: string, isArchived?: boolean, tags?: string[]) =>
+  `${conversationsRoot}?studentId=${studentId}&pageNumber=${pageNumber}&courseId=${courseId}${isArchived ? '&isArchived=true' : ''}${tags
     ?.map((tag) => `&tags=${tag}`)
     .join('')}`;
 

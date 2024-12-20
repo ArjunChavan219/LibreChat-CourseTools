@@ -6,12 +6,20 @@ import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from '~/comp
 import { useChatContext, useAssistantsMapContext } from '~/Providers';
 import { useGetAssistantDocsQuery } from '~/data-provider';
 import ConvoIcon from '~/components/Endpoints/ConvoIcon';
-import { useLocalize, useSubmitMessage } from '~/hooks';
+import { useAuthContext, useLocalize, useSubmitMessage } from '~/hooks';
 import { BirthdayIcon } from '~/components/svg';
 import { getIconEndpoint, cn } from '~/utils';
 import ConvoStarter from './ConvoStarter';
+import StudentCourseCards from '../CourseTools/Students/StudentCourseCards';
+import CourseCards from '../CourseTools/Professor/CourseCards';
+import CourseDetailsPage from '../CourseTools/Professor/CourseDetailsPage';
+
 
 export default function Landing({ Header }: { Header?: ReactNode }) {
+  const { user, courseId, isTACourse } = useAuthContext();
+  const isStudent = user?.profileRole === "Student" || (user?.profileRole === "TA" && !isTACourse);
+  const isCourse = courseId != undefined;
+  
   const { conversation } = useChatContext();
   const assistantMap = useAssistantsMapContext();
   const { data: startupConfig } = useGetStartupConfig();
@@ -63,7 +71,8 @@ export default function Landing({ Header }: { Header?: ReactNode }) {
         <div className="relative h-full">
           <div className="absolute left-0 right-0">{Header != null ? Header : null}</div>
           <div className="flex h-full flex-col items-center justify-center">
-            <div className={cn('relative h-12 w-12', assistantName && avatar ? 'mb-0' : 'mb-3')}>
+          {isStudent ?
+              (<><div className={cn('relative h-12 w-12', assistantName && avatar ? 'mb-0' : 'mb-3')}>
               <ConvoIcon
                 conversation={conversation}
                 assistantMap={assistantMap}
@@ -85,24 +94,26 @@ export default function Landing({ Header }: { Header?: ReactNode }) {
               ) : null}
             </div>
             {assistantName ? (
-              <div className="flex flex-col items-center gap-0 p-2">
-                <div className="text-center text-2xl font-medium dark:text-white">
-                  {assistantName}
+                <div className="flex flex-col items-center gap-0 p-2">
+                  <div className="text-center text-2xl font-medium dark:text-white">
+                    {assistantName}
+                  </div>
+                  <div className="max-w-md text-center text-sm font-normal text-text-primary ">
+                    {assistantDesc ? assistantDesc : localize('com_nav_welcome_message')}
+                  </div>
+                  {/* <div className="mt-1 flex items-center gap-1 text-token-text-tertiary">
+                    <div className="text-sm text-token-text-tertiary">By Daniel Avila</div>
+                  </div> */}
                 </div>
-                <div className="max-w-md text-center text-sm font-normal text-text-primary ">
-                  {assistantDesc ? assistantDesc : localize('com_nav_welcome_message')}
-                </div>
-                {/* <div className="mt-1 flex items-center gap-1 text-token-text-tertiary">
-              <div className="text-sm text-token-text-tertiary">By Daniel Avila</div>
-            </div> */}
-              </div>
-            ) : (
-              <h2 className="mb-5 max-w-[75vh] px-12 text-center text-lg font-medium dark:text-white md:px-0 md:text-2xl">
-                {isAssistant
-                  ? conversation?.greeting ?? localize('com_nav_welcome_assistant')
-                  : conversation?.greeting ?? localize('com_nav_welcome_message')}
-              </h2>
-            )}
+              ) : (
+                <h2 className="mb-5 max-w-[75vh] px-12 text-center text-lg font-medium dark:text-white md:px-0 md:text-2xl">
+                  {!isCourse ? <>Which course can I help you with today?</> : <>{isAssistant
+                    ? conversation?.greeting ?? localize('com_nav_welcome_assistant')
+                    : conversation?.greeting ?? localize('com_nav_welcome_message')}</>}
+                </h2>
+              )}</>) : <>{!isCourse ? <></> : <CourseDetailsPage />}</>}
+            {isStudent && !isCourse && <StudentCourseCards isNav={false}/>}
+            {!isStudent && !isCourse && <CourseCards isNav={false}/>}
             <div className="mt-8 flex flex-wrap justify-center gap-3 px-4">
               {conversation_starters.length > 0 &&
                 conversation_starters

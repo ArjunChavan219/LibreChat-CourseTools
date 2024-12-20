@@ -19,6 +19,9 @@ const convoSchema = mongoose.Schema(
       type: String,
       index: true,
     },
+    courseId: {
+      type: String
+    },
     messages: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Message' }],
     // google only
     examples: { type: [{ type: mongoose.Schema.Types.Mixed }], default: undefined },

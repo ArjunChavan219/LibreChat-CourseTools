@@ -10,11 +10,11 @@ import { ConversationListResponse } from 'librechat-data-provider';
 
 export default function ArchivedChatsTable({ className }: { className?: string }) {
   const localize = useLocalize();
-  const { isAuthenticated } = useAuthContext();
+  const { isAuthenticated, courseId: course } = useAuthContext();
   const [showLoading, setShowLoading] = useState(false);
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } = useConversationsInfiniteQuery(
-    { pageNumber: '1', isArchived: true },
+    { pageNumber: '1', courseId: course || "1", isArchived: true },
     { enabled: isAuthenticated },
   );
 

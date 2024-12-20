@@ -109,6 +109,11 @@ const startServer = async () => {
 
   app.use('/api/tags', routes.tags);
 
+  app.use('/api/courses', routes.courseRoutes);
+  app.use('/api/professors', routes.professorRoutes);
+  app.use('/api/util', routes.utilRoutes);
+  app.use('/api/student', routes.studentRoutes);
+
   app.use((req, res) => {
     // Replace lang attribute in index.html with lang from cookies or accept-language header
     const lang = req.cookies.lang || req.headers['accept-language']?.split(',')[0] || 'en-US';

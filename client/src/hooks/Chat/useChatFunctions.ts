@@ -84,6 +84,7 @@ export default function useChatFunctions({
       isEdited = false,
       overrideMessages,
     } = {},
+    courseId
   ) => {
     setShowStopButton(false);
     resetLatestMultiMessage();
@@ -266,6 +267,7 @@ export default function useChatFunctions({
       isContinued,
       isRegenerate,
       initialResponse,
+      courseId: courseId || "1",
     };
 
     if (isRegenerate) {

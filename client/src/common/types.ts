@@ -304,7 +304,7 @@ export type TOptions = {
   overrideMessages?: TMessage[];
 };
 
-export type TAskFunction = (props: TAskProps, options?: TOptions) => void;
+export type TAskFunction = (props: TAskProps, options?: TOptions, courseId?: string) => void;
 
 export type TMessageProps = {
   conversation?: TConversation | null;
@@ -388,10 +388,17 @@ export type TAuthContext = {
   token: string | undefined;
   isAuthenticated: boolean;
   error: string | undefined;
+  courseId: string | undefined;
+  studentId: string | undefined;
+  studentName: string | undefined;
+  isTACourse: boolean | undefined;
   login: (data: TLoginUser) => void;
   logout: () => void;
   setError: React.Dispatch<React.SetStateAction<string | undefined>>;
-  roles?: Record<string, TRole | null | undefined>;
+  setCourseId: React.Dispatch<React.SetStateAction<string | undefined>>;
+  setStudentId: React.Dispatch<React.SetStateAction<string | undefined>>;
+  setStudentName: React.Dispatch<React.SetStateAction<string | undefined>>;
+  setIsTACourse: React.Dispatch<React.SetStateAction<boolean | undefined>>;
 };
 
 export type TUserContext = {

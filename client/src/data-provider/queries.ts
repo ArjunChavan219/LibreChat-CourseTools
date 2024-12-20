@@ -34,6 +34,7 @@ import type {
   SharedLinksResponse,
   TUserTermsResponse,
   TAcceptTermsResponse,
+  StudentConversationListParams,
 } from 'librechat-data-provider';
 import { findPageForConversation, addFileToCache } from '~/utils';
 
@@ -130,7 +131,7 @@ export const useSearchInfiniteQuery = (
   return useInfiniteQuery<ConversationListResponse, unknown>(
     [QueryKeys.searchConversations, params], // Include the searchQuery in the query key
     ({ pageParam = '1' }) =>
-      dataService.listConversationsByQuery({ ...params, pageNumber: pageParam }),
+      dataService.listConversationsByQuery({ ...params, pageNumber: pageParam, courseId: params?.courseId || "1" }),
     {
       getNextPageParam: (lastPage) => {
         const currentPageNumber = Number(lastPage.pageNumber);
@@ -155,6 +156,37 @@ export const useConversationsInfiniteQuery = (
       dataService.listConversations({
         ...params,
         pageNumber: pageParam?.toString(),
+        courseId: params?.courseId || "1",
+        isArchived: params?.isArchived || false,
+        tags: params?.tags || [],
+      }),
+    {
+      getNextPageParam: (lastPage) => {
+        const currentPageNumber = Number(lastPage.pageNumber);
+        const totalPages = Number(lastPage.pages); // Convert totalPages to a number
+        // If the current page number is less than total pages, return the next page number
+        return currentPageNumber < totalPages ? currentPageNumber + 1 : undefined;
+      },
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+      refetchOnMount: false,
+      ...config,
+    },
+  );
+};
+
+export const useStudentConversationsInfiniteQuery = (
+  params?: StudentConversationListParams,
+  config?: UseInfiniteQueryOptions<ConversationListResponse, unknown>,
+) => {
+  return useInfiniteQuery<ConversationListResponse, unknown>(
+    params?.isArchived ? [QueryKeys.archivedConversations] : [QueryKeys.allConversations],
+    ({ pageParam = '' }) =>
+      dataService.listStudentConversations({
+        ...params,
+        studentId: params?.studentId || "1",
+        pageNumber: pageParam?.toString(),
+        courseId: params?.courseId || "1",
         isArchived: params?.isArchived || false,
         tags: params?.tags || [],
       }),
@@ -183,6 +215,7 @@ export const useSharedLinksInfiniteQuery = (
       dataService.listSharedLinks({
         ...params,
         pageNumber: pageParam?.toString(),
+        courseId: params?.courseId || "1",
         isPublic: params?.isPublic || true,
       }),
     {

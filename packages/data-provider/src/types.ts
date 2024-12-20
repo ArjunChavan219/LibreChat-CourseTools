@@ -48,6 +48,7 @@ export type TPayload = Partial<TMessage> &
     isContinued: boolean;
     conversationId: string | null;
     messages?: TMessages;
+    courseId: string;
   };
 
 export type TSubmission = {
@@ -63,6 +64,7 @@ export type TSubmission = {
   initialResponse?: TMessage;
   conversation: Partial<TConversation>;
   endpointOption: TEndpointOption;
+  courseId: string;
 };
 
 export type EventSubmission = Omit<TSubmission, 'initialResponse'> & { initialResponse: TMessage };
@@ -108,6 +110,7 @@ export type TUser = {
   name: string;
   avatar: string;
   role: string;
+  profileRole: string;
   provider: string;
   plugins: string[];
   createdAt: string;
@@ -258,6 +261,7 @@ export type TRegisterUser = {
   email: string;
   username: string;
   password: string;
+  courseId: string;
   confirm_password?: string;
   token?: string;
 };
@@ -265,6 +269,7 @@ export type TRegisterUser = {
 export type TLoginUser = {
   email: string;
   password: string;
+  courseToken?: string;
 };
 
 export type TLoginResponse = {
@@ -506,4 +511,38 @@ export type TUserTermsResponse = {
 
 export type TAcceptTermsResponse = {
   success: boolean;
+};
+
+
+/* Course Tools Types */
+export type TTokenValidityResponse = {
+  courseId: string;
+  message: string;
+};
+
+export type TCourse = {
+  id: string;
+  name: string;
+  description: string;
+  professor: {
+      userId: {
+          name: string;
+          email: string;
+          id: string;
+      }
+  }
+};
+
+export type TStudent = {
+  id: string;
+  name: string;
+  email: string;
+  userId: string;
+  type: 'Student' | 'TA';
+};
+
+export type TAddStudentToCourseParams = {
+  courseId: string;
+  studentId: string;
+  isTA: boolean;
 };

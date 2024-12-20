@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState, useMemo, memo } from 'react';
 import { useRecoilValue } from 'recoil';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { PermissionTypes, Permissions } from 'librechat-data-provider';
 import type { ConversationListResponse } from 'librechat-data-provider';
 import {
@@ -13,7 +13,7 @@ import {
   useNavScrolling,
   useConversations,
 } from '~/hooks';
-import { useConversationsInfiniteQuery } from '~/data-provider';
+import { useConversationsInfiniteQuery, useStudentConversationsInfiniteQuery } from '~/data-provider';
 import { TooltipProvider, Tooltip } from '~/components/ui';
 import { Conversations } from '~/components/Conversations';
 import BookmarkNav from './Bookmarks/BookmarkNav';
@@ -26,6 +26,9 @@ import NewChat from './NewChat';
 import { cn } from '~/utils';
 import store from '~/store';
 
+import StudentCourseCards from '../CourseTools/Students/StudentCourseCards';
+import CourseCards from '../CourseTools/Professor/CourseCards';
+
 const Nav = ({
   navVisible,
   setNavVisible,
@@ -33,9 +36,13 @@ const Nav = ({
   navVisible: boolean;
   setNavVisible: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
+  const { user, courseId, isAuthenticated, studentId, setCourseId, isTACourse, setIsTACourse, studentName } = useAuthContext();
+  const course = courseId || "1";
+  const isStudent = user?.profileRole === "Student" || (user?.profileRole === "TA" && !isTACourse);
+  
   const localize = useLocalize();
   const { conversationId } = useParams();
-  const { isAuthenticated } = useAuthContext();
+  const navigate = useNavigate();
 
   const [navWidth, setNavWidth] = useState('260px');
   const [isHovering, setIsHovering] = useState(false);
@@ -75,10 +82,21 @@ const Nav = ({
   const { refreshConversations } = useConversations();
   const { pageNumber, searchQuery, setPageNumber, searchQueryRes } = useSearchContext();
   const [tags, setTags] = useState<string[]>([]);
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, refetch } =
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, refetch } = studentId ?
+    useStudentConversationsInfiniteQuery(
+      {
+        studentId,
+        pageNumber: pageNumber.toString(),
+        courseId: course,
+        isArchived: false,
+        tags: tags.length === 0 ? undefined : tags,
+      },
+      { enabled: isAuthenticated },
+    ) :
     useConversationsInfiniteQuery(
       {
         pageNumber: pageNumber.toString(),
+        courseId: course,
         isArchived: false,
         tags: tags.length === 0 ? undefined : tags,
       },
@@ -88,7 +106,7 @@ const Nav = ({
     // When a tag is selected, refetch the list of conversations related to that tag
     refetch();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tags]);
+  }, [tags, courseId, studentId]);
   const { containerRef, moveToTop } = useNavScrolling<ConversationListResponse>({
     setShowLoading,
     hasNextPage: searchQuery ? searchQueryRes?.hasNextPage : hasNextPage,
@@ -99,8 +117,7 @@ const Nav = ({
   });
 
   const conversations = useMemo(
-    () =>
-      (searchQuery ? searchQueryRes?.data : data)?.pages.flatMap((page) => page.conversations) ||
+    () => (searchQuery ? searchQueryRes?.data : data)?.pages.flatMap((page) => page.conversations) ||
       [],
     [data, searchQuery, searchQueryRes?.data],
   );
@@ -128,6 +145,13 @@ const Nav = ({
       toggleNavVisible();
     }
   };
+
+  const handleDashboardClick = () => {
+    setCourseId(undefined);
+    setIsTACourse(false);
+    navigate('/c/new', { replace: true });
+    
+  }
 
   return (
     <TooltipProvider delayDuration={250}>
@@ -178,9 +202,65 @@ const Nav = ({
                           {hasAccessToBookmarks === true && (
                             <BookmarkNav tags={tags} setTags={setTags} />
                           )}
-                        </div>
-                      ) : (
-                        <NewChat
+                        </div>) : (<div
+                          style={{
+                            backgroundColor: '#f8f8f8',
+                            color: '#333',
+                            textAlign: 'left',
+                            width: '100%',
+                            padding: '16px',
+                            cursor: 'pointer',
+                            borderBottom: '1px solid #ccc',
+                            fontSize: '18px',
+                            fontFamily: 'Arial, sans-serif'
+                        }}
+                          onClick={handleDashboardClick}
+                      >
+                          Dashboard
+                      </div>)
+                      }
+                      {courseId ? <p style={{
+                            color: '#333',
+                            fontSize: '16px',
+                            fontFamily: 'Arial, sans-serif',
+                            padding: '16px',
+                            borderBottom: '1px solid #ccc',
+                            marginBottom: '16px'
+                        }}>{`Course ID ${courseId} Chats`}</p> :
+                        (isStudent ? <StudentCourseCards isNav={true}/> : <CourseCards isNav={true}/>)
+                      }
+                      
+                      {!isStudent && courseId && <button onClick={() => navigate('/c/new', { replace: true })} style={{
+                            backgroundColor: '#f8f8f8',
+                            color: '#333',
+                            border: '1px solid #ccc',
+                            padding: '10px 20px',
+                            borderRadius: '4px',
+                            cursor: 'pointer',
+                            fontSize: '16px',
+                            fontFamily: 'Arial, sans-serif',
+                            display: 'block',
+                            width: 'calc(100% - 40px)',
+                            textAlign: 'center',
+                            marginBottom: '16px'
+                        }}>Roster</button>}
+                      
+                      {!isStudent && courseId && !studentId && <><p style={{
+                              color: '#666',
+                              fontSize: '16px',
+                              fontFamily: 'Arial, sans-serif',
+                              padding: '16px',
+                              marginBottom: '16px'
+                          }}>{`No Student selected`}</p></>}
+                      
+                      {!isStudent && courseId && studentId && <><p style={{
+                              color: '#666',
+                              fontSize: '16px',
+                              fontFamily: 'Arial, sans-serif',
+                              padding: '16px',
+                              marginBottom: '16px'
+                          }}>{`Chats of ${studentName}`}</p></>}
+                      {isStudent && !isTACourse && courseId && <NewChat
                           toggleNav={itemToggleNav}
                           subHeaders={
                             <>
@@ -194,15 +274,15 @@ const Nav = ({
                                 <BookmarkNav tags={tags} setTags={setTags} />
                               )}
                             </>
-                          }
-                        />
-                      )}
+                          }/>}
 
-                      <Conversations
-                        conversations={conversations}
-                        moveToTop={moveToTop}
-                        toggleNav={itemToggleNav}
-                      />
+                      {((isStudent && !isTACourse && courseId) || ((!isStudent || isTACourse) && courseId && studentId)) &&
+                        <Conversations
+                          conversations={conversations}
+                          moveToTop={moveToTop}
+                          toggleNav={itemToggleNav}
+                        />
+                      }
                       {(isFetchingNextPage || showLoading) && (
                         <Spinner className={cn('m-1 mx-auto mb-4 h-4 w-4 text-text-primary')} />
                       )}

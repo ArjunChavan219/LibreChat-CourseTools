@@ -22,7 +22,7 @@ function Login() {
           setError={setError}
         />
       )}
-      {startupConfig?.registrationEnabled && (
+      {/* {startupConfig?.registrationEnabled && (
         <p className="my-4 text-center text-sm font-light text-gray-700 dark:text-white">
           {' '}
           {localize('com_auth_no_account')}{' '}
@@ -30,7 +30,7 @@ function Login() {
             {localize('com_auth_sign_up')}
           </a>
         </p>
-      )}
+      )} */}
     </>
   );
 }

@@ -37,7 +37,7 @@ sessionSchema.methods.generateRefreshToken = async function () {
       payload: { id: this.user },
       secret: process.env.JWT_REFRESH_SECRET,
       expirationTime: Math.floor((expiresIn - Date.now()) / 1000),
-    });
+    });    
 
     this.refreshTokenHash = await hashToken(refreshToken);
 

@@ -6,9 +6,10 @@ import {
   useContext,
   useCallback,
   createContext,
+  useRef,
 } from 'react';
 import { useRecoilState } from 'recoil';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { setTokenHeader, SystemRoles } from 'librechat-data-provider';
 import {
   useGetUserQuery,
@@ -33,12 +34,18 @@ const AuthContextProvider = ({
   const [user, setUser] = useRecoilState(store.user);
   const [token, setToken] = useState<string | undefined>(undefined);
   const [error, setError] = useState<string | undefined>(undefined);
+  const [courseId, setCourseId] = useState<string | undefined>(undefined);
+  const [studentId, setStudentId] = useState<string | undefined>(undefined);
+  const [studentName, setStudentName] = useState<string | undefined>(undefined);
+  const [isTACourse, setIsTACourse] = useState<boolean | undefined>(undefined);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const isLogoutRef = useRef(false);
   const { data: userRole = null } = useGetRole(SystemRoles.USER, {
     enabled: !!(isAuthenticated && user?.role),
   });
 
   const navigate = useNavigate();
+  const location = useLocation();
 
   const setUserContext = useCallback(
     (userContext: TUserContext) => {
@@ -50,6 +57,7 @@ const AuthContextProvider = ({
       //@ts-ignore - ok for token to be undefined initially
       setTokenHeader(token);
       setIsAuthenticated(isAuthenticated);
+      
       if (redirect) {
         navigate(redirect, { replace: true });
       }
@@ -61,6 +69,7 @@ const AuthContextProvider = ({
   const loginUser = useLoginUserMutation();
   const logoutUser = useLogoutUserMutation({
     onSuccess: () => {
+      isLogoutRef.current = true;
       setUserContext({
         token: undefined,
         isAuthenticated: false,
@@ -89,6 +98,7 @@ const AuthContextProvider = ({
         const { user, token } = data;
         setError(undefined);
         setUserContext({ token, isAuthenticated: true, user, redirect: '/c/new' });
+        
       },
       onError: (error: TResError | unknown) => {
         const resError = error as TResError;
@@ -98,7 +108,7 @@ const AuthContextProvider = ({
     });
   };
 
-  const silentRefresh = useCallback(() => {
+  const silentRefresh = useCallback(() => {    
     if (authConfig?.test) {
       console.log('Test mode. Skipping silent refresh.');
       return;
@@ -113,7 +123,12 @@ const AuthContextProvider = ({
           if (authConfig?.test) {
             return;
           }
-          navigate('/login');
+          
+          const queryParams = new URLSearchParams(location.search);
+          const courseToken = queryParams.get('courseToken');
+
+          navigate((courseToken && !isLogoutRef.current) ? `/login?courseToken=${courseToken}` : '/login');
+          isLogoutRef.current = false;
         }
       },
       onError: (error) => {
@@ -136,7 +151,7 @@ const AuthContextProvider = ({
     if (error && isAuthenticated) {
       doSetError(undefined);
     }
-    if (!token || !isAuthenticated) {
+    if (!token || !isAuthenticated) {      
       silentRefresh();
     }
   }, [
@@ -177,13 +192,21 @@ const AuthContextProvider = ({
       login,
       logout,
       setError,
+      courseId,
+      setCourseId,
+      studentId,
+      setStudentId,
+      studentName,
+      setStudentName,
+      isTACourse,
+      setIsTACourse,
       roles: {
         [SystemRoles.USER]: userRole,
       },
       isAuthenticated,
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [user, error, isAuthenticated, token, userRole],
+    [user, error, isAuthenticated, token, userRole, courseId, studentId, studentName, isTACourse],
   );
 
   return <AuthContext.Provider value={memoedValue}>{children}</AuthContext.Provider>;

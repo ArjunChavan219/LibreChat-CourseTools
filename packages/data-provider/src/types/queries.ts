@@ -17,6 +17,20 @@ export type ConversationListParams = {
   after?: string | null;
   order?: 'asc' | 'desc';
   pageNumber: string;
+  courseId: string;
+  conversationId?: string;
+  isArchived?: boolean;
+  tags?: string[];
+};
+
+export type StudentConversationListParams = {
+  limit?: number;
+  before?: string | null;
+  after?: string | null;
+  order?: 'asc' | 'desc';
+  pageNumber: string;
+  courseId: string;
+  studentId: string;
   conversationId?: string;
   isArchived?: boolean;
   tags?: string[];

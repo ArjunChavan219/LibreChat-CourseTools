@@ -2,7 +2,7 @@ import { useCallback, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { QueryKeys } from 'librechat-data-provider';
 import { useRecoilState, useResetRecoilState, useSetRecoilState } from 'recoil';
-import { useGetMessagesByConvoId } from 'librechat-data-provider/react-query';
+import { useGetMessagesByConvoId, useGetStudentMessagesByConvoId } from 'librechat-data-provider/react-query';
 import type { TMessage } from 'librechat-data-provider';
 import useChatFunctions from '~/hooks/Chat/useChatFunctions';
 import { useAuthContext } from '~/hooks/AuthContext';
@@ -16,7 +16,7 @@ export default function useChatHelpers(index = 0, paramId?: string) {
   const [filesLoading, setFilesLoading] = useState(false);
 
   const queryClient = useQueryClient();
-  const { isAuthenticated } = useAuthContext();
+  const { isAuthenticated, courseId, studentId } = useAuthContext();
 
   const { newConversation } = useNewConvo(index);
   const { useCreateConversationAtom } = store;
@@ -27,7 +27,9 @@ export default function useChatHelpers(index = 0, paramId?: string) {
 
   /* Messages: here simply to fetch, don't export and use `getMessages()` instead */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { data: _messages } = useGetMessagesByConvoId(conversationId ?? '', {
+  const { data: _messages } = studentId ? useGetStudentMessagesByConvoId(conversationId ?? '', studentId, {
+    enabled: isAuthenticated,
+  }) : useGetMessagesByConvoId(conversationId ?? '', {
     enabled: isAuthenticated,
   });
 
@@ -99,7 +101,7 @@ export default function useChatHelpers(index = 0, paramId?: string) {
     );
 
     if (parentMessage && parentMessage.isCreatedByUser) {
-      ask({ ...parentMessage }, { isContinued: true, isRegenerate: true, isEdited: true });
+      ask({ ...parentMessage }, { isContinued: true, isRegenerate: true, isEdited: true }, courseId || "1");
     } else {
       console.error(
         'Failed to regenerate the message: parentMessage not found, or not created by user.',

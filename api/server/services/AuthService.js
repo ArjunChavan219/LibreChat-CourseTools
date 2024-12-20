@@ -146,8 +146,8 @@ const registerUser = async (user, additionalData = {}) => {
 
     return { status: 404, message: errorMessage };
   }
-
-  const { email, password, name, username } = user;
+  
+  const { email, password, name, username, courseId } = user;
 
   let newUserId;
   try {
@@ -173,7 +173,8 @@ const registerUser = async (user, additionalData = {}) => {
     }
 
     //determine if this is the first registered user (not counting anonymous_user)
-    const isFirstRegisteredUser = (await countUsers()) === 0;
+    const isFirstRegisteredUser = !courseId;
+    // const isFirstRegisteredUser = (await countUsers()) === 0;
 
     const salt = bcrypt.genSaltSync(10);
     const newUserData = {
@@ -185,10 +186,10 @@ const registerUser = async (user, additionalData = {}) => {
       role: isFirstRegisteredUser ? SystemRoles.ADMIN : SystemRoles.USER,
       password: bcrypt.hashSync(password, salt),
       ...additionalData,
-    };
+    };    
 
     const emailEnabled = checkEmailConfig();
-    const newUser = await createUser(newUserData, false, true);
+    const newUser = await createUser(newUserData, courseId, false, true);
     newUserId = newUser._id;
     if (emailEnabled && !newUser.emailVerified) {
       await sendVerificationEmail({

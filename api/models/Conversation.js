@@ -9,7 +9,7 @@ const logger = require('~/config/winston');
  */
 const searchConversation = async (conversationId) => {
   try {
-    return await Conversation.findOne({ conversationId }, 'conversationId user').lean();
+    return await Conversation.findOne({ conversationId }, 'conversationId user course').lean();
   } catch (error) {
     logger.error('[searchConversation] Error searching conversation', error);
     throw new Error('Error searching conversation');
@@ -31,6 +31,21 @@ const getConvo = async (user, conversationId) => {
   }
 };
 
+/**
+ * Retrieves all the conversation for a given user and conversation ID.
+ * @param {string} user - The user's ID.
+ * @param {string} courseId - The course's ID.
+ * @returns {Promise<TConversation>} The conversation object.
+ */
+const getConvos = async (user, conversationId) => {
+  try {
+    return await Conversation.findOne({ user, conversationId }).lean();
+  } catch (error) {
+    logger.error('[getConvo] Error getting single conversation', error);
+    return { message: 'Error getting single conversation' };
+  }
+};
+
 module.exports = {
   Conversation,
   searchConversation,
@@ -41,19 +56,28 @@ module.exports = {
    * @param {Object} metadata - Additional metadata to log for operation.
    * @returns {Promise<TConversation>} The conversation object.
    */
-  saveConvo: async (req, { conversationId, newConversationId, ...convo }, metadata) => {
+  saveConvo: async (req, { conversationId, newConversationId, ...convo }, metadata) => {    
     try {
       if (metadata && metadata?.context) {
         logger.debug(`[saveConvo] ${metadata.context}`);
-      }
+      }      
       const messages = await getMessages({ conversationId }, '_id');
-      const update = { ...convo, messages, user: req.user.id };
+
+      const courseId = req.body.courseId;
+      let update, search;
+      if (courseId) {
+        update = { ...convo, messages, user: req.user.id, courseId };
+        search = { conversationId, user: req.user.id, courseId }
+      } else {
+        update = { ...convo, messages, user: req.user.id };
+        search = { conversationId, user: req.user.id }
+      }
       if (newConversationId) {
         update.conversationId = newConversationId;
       }
-
+      
       const conversation = await Conversation.findOneAndUpdate(
-        { conversationId, user: req.user.id },
+        search,
         update,
         {
           new: true,
@@ -74,7 +98,7 @@ module.exports = {
     try {
       const bulkOps = conversations.map((convo) => ({
         updateOne: {
-          filter: { conversationId: convo.conversationId, user: convo.user },
+          filter: { conversationId: convo.conversationId, user: convo.user, courseId: convo.courseId },
           update: convo,
           upsert: true,
           timestamps: false,
@@ -88,8 +112,8 @@ module.exports = {
       throw new Error('Failed to save conversations in bulk.');
     }
   },
-  getConvosByPage: async (user, pageNumber = 1, pageSize = 25, isArchived = false, tags) => {
-    const query = { user };
+  getConvosByPage: async (user, courseId, pageNumber = 1, pageSize = 25, isArchived = false, tags) => {
+    const query = { user, courseId };
     if (isArchived) {
       query.isArchived = true;
     } else {

@@ -45,10 +45,27 @@ export const useGetUserQuery = (
 export const useGetMessagesByConvoId = <TData = s.TMessage[]>(
   id: string,
   config?: UseQueryOptions<s.TMessage[], unknown, TData>,
-): QueryObserverResult<TData> => {
+): QueryObserverResult<TData> => {  
   return useQuery<s.TMessage[], unknown, TData>(
     [QueryKeys.messages, id],
     () => dataService.getMessagesByConvoId(id),
+    {
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+      refetchOnMount: false,
+      ...config,
+    },
+  );
+};
+
+export const useGetStudentMessagesByConvoId = <TData = s.TMessage[]>(
+  id: string,
+  studentId: string,
+  config?: UseQueryOptions<s.TMessage[], unknown, TData>,
+): QueryObserverResult<TData> => {  
+  return useQuery<s.TMessage[], unknown, TData>(
+    [QueryKeys.messages, id],
+    () => dataService.getStudentMessagesByConvoId(id, studentId),
     {
       refetchOnWindowFocus: false,
       refetchOnReconnect: false,
@@ -436,4 +453,75 @@ export const useGetCustomConfigSpeechQuery = (
       ...config,
     },
   );
+};
+
+
+/* Course Tools Hooks */
+export const useCheckTokenValidity = (courseToken: string) => {
+  return useQuery(['checkTokenValidity', courseToken], () => dataService.checkTokenValidity(courseToken));
+};
+
+export const useCoursesByProfessor = (professorId: string | undefined, setCourses: React.Dispatch<React.SetStateAction<t.TCourse[]>>) => {
+  const query = useQuery(['courses', professorId], () => dataService.fetchCoursesByProfessorId(professorId), {
+      enabled: !!professorId,
+      onSuccess: data => {
+          setCourses(data);
+      },
+      onError: (error: any) => {
+          console.error("Failed to fetch courses:", error.message);
+      }
+  });
+
+  return {
+      ...query,
+      isLoading: query.isLoading,
+      error: query.error
+  };
+};
+
+export const useAddCourse = (professorId: string | undefined, onSuccess: (newCourse: t.TCourse) => void, onError: (error: Error) => void) => {
+    return useMutation((course: { name: string; description: string; id: string }) => dataService.addCourse(professorId, course), {
+        onSuccess,
+        onError,
+    });
+};
+
+export const useGenerateInviteLink = (onSuccess: () => void, onError: (error: Error) => void) => {
+  return useMutation(dataService.generateInviteLink, {
+      onSuccess: (token: string) => {
+          const baseURL = `${window.location.protocol}//${window.location.host}/register`;
+          const link = `${baseURL}?courseToken=${token}`;
+
+          navigator.clipboard.writeText(link)
+              .then(() => onSuccess()) // Notify success (possibly to toggle copied state)
+              .catch((err) => {
+                  console.error('Error copying to clipboard:', err);
+              });
+      },
+      onError,
+  });
+};
+
+export const useAddStudentToCourse = () => {
+  return useMutation((params: t.TAddStudentToCourseParams) => dataService.addStudentToCourse(params));
+};
+
+export const useChangeStudentRole = () => {
+  return useMutation(dataService.changeStudentRole);
+};
+
+export const useRemoveStudentFromCourse = () => {
+    return useMutation(dataService.removeStudentFromCourse);
+};
+
+export const useFetchRoster = (courseId: string) => {
+    return useQuery(['roster', courseId], () => dataService.fetchRoster(courseId));
+};
+
+export const useFetchNewStudents = (courseId: string) => {
+  return useQuery(['new-students', courseId], () => dataService.fetchNewStudents(courseId));
+};
+
+export const useFetchCourses = (userId: string) => {
+  return useQuery(['courses', userId], () => dataService.fetchCourses(userId));
 };

@@ -24,6 +24,11 @@ const keys = require('./keys');
 const user = require('./user');
 const ask = require('./ask');
 
+const courseRoutes = require('./courseRoutes');
+const professorRoutes = require('./professorRoutes');
+const utilRoutes = require('./utilRoutes');
+const studentRoutes = require('./studentRoutes');
+
 module.exports = {
   ask,
   edit,
@@ -50,4 +55,8 @@ module.exports = {
   assistants,
   categories,
   staticRoute,
+  courseRoutes,
+  professorRoutes,
+  utilRoutes,
+  studentRoutes,
 };

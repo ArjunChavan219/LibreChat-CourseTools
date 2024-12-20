@@ -1,7 +1,7 @@
 import { useForm } from 'react-hook-form';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useOutletContext, useLocation } from 'react-router-dom';
-import { useRegisterUserMutation } from 'librechat-data-provider/react-query';
+import { useRegisterUserMutation, useCheckTokenValidity } from 'librechat-data-provider/react-query';
 import type { TRegisterUser, TError } from 'librechat-data-provider';
 import type { TLoginLayoutContext } from '~/common';
 import { ErrorMessage } from './ErrorMessage';
@@ -28,7 +28,42 @@ const Registration: React.FC = () => {
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const token = queryParams.get('token');
+  const courseToken = queryParams.get('courseToken') || '1';
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string>('');
+  const [courseId, setCourseId] = useState<string>('');
 
+  const { data, error: queryError, isLoading, isError } = useCheckTokenValidity(courseToken);
+
+  useEffect(() => {
+    if (!courseToken) {
+      setError('No token provided');
+      setLoading(false);
+      return;
+    }
+  }, [courseToken]);
+
+  useEffect(() => {
+    setLoading(isLoading);
+  }, [isLoading]);
+
+  useEffect(() => {
+    if (isError && queryError) {
+      setError((queryError instanceof Error) ? queryError.message : 'Failed to validate token');
+    }
+  }, [isError, queryError]);
+
+  useEffect(() => {
+    if (!isLoading && !isError && data) {
+      if (data.message === 'Token is valid') {
+        setCourseId(data.courseId);
+      } else {
+        setError('Token is invalid');
+      }
+    }
+  }, [data, isLoading, isError]);
+
+  
   const registerUser = useRegisterUserMutation({
     onMutate: () => {
       setIsSubmitting(true);
@@ -88,6 +123,16 @@ const Registration: React.FC = () => {
     </div>
   );
 
+  if (loading) {
+      return <div>Loading...</div>;
+  }
+
+  if (error) {
+      return <div>Error: {error}</div>;
+  }
+
+  
+
   return (
     <>
       {errorMessage && (
@@ -116,7 +161,7 @@ const Registration: React.FC = () => {
             aria-label="Registration form"
             method="POST"
             onSubmit={handleSubmit((data: TRegisterUser) =>
-              registerUser.mutate({ ...data, token: token ?? undefined }),
+              registerUser.mutate({ ...data, courseId, token: token ?? undefined }),
             )}
           >
             {renderInput('name', 'com_auth_full_name', 'text', {
@@ -184,7 +229,7 @@ const Registration: React.FC = () => {
 
           <p className="my-4 text-center text-sm font-light text-gray-700 dark:text-white">
             {localize('com_auth_already_have_account')}{' '}
-            <a href="/login" aria-label="Login" className="p-1 text-green-500">
+            <a href={courseToken ? `/login?courseToken=${courseToken}` : '/login'} aria-label="Login" className="p-1 text-green-500">
               {localize('com_auth_login')}
             </a>
           </p>

@@ -31,6 +31,7 @@ import {
   updateConversation,
   deleteConversation,
 } from '~/utils';
+import { useAuthContext } from '~/hooks';
 
 export type TGenTitleMutation = UseMutationResult<
   t.TGenTitleResponse,
@@ -129,9 +130,11 @@ export const useArchiveConversationMutation = (
   unknown
 > => {
   const queryClient = useQueryClient();
+  const { courseId } = useAuthContext();
   const { refetch } = useConversationsInfiniteQuery();
   const { refetch: archiveRefetch } = useConversationsInfiniteQuery({
     pageNumber: '1', // dummy value not used to refetch
+    courseId: courseId || '1',
     isArchived: true,
   });
   return useMutation(
@@ -863,7 +866,7 @@ export const useUpdateAssistantMutation = (
       const { endpoint } = data;
       const endpointsConfig = queryClient.getQueryData<t.TEndpointsConfig>([QueryKeys.endpoints]);
       const endpointConfig = endpointsConfig?.[endpoint];
-      const version = endpointConfig.version ?? defaultAssistantsVersion[endpoint];
+      const version = endpointConfig?.version ?? defaultAssistantsVersion[endpoint];
       return dataService.updateAssistant({
         data,
         version,

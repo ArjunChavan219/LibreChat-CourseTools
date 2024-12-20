@@ -132,11 +132,11 @@ function ShareLinkRow({ sharedLink }: { sharedLink: TSharedLink }) {
 }
 export default function ShareLinkTable({ className }: { className?: string }) {
   const localize = useLocalize();
-  const { isAuthenticated } = useAuthContext();
+  const { isAuthenticated, courseId: course } = useAuthContext();
   const [showLoading, setShowLoading] = useState(false);
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isError, isLoading } =
-    useSharedLinksInfiniteQuery({ pageNumber: '1', isPublic: true }, { enabled: isAuthenticated });
+    useSharedLinksInfiniteQuery({ pageNumber: '1', courseId: course || "1", isPublic: true }, { enabled: isAuthenticated });
 
   const { containerRef } = useNavScrolling<SharedLinksResponse>({
     setShowLoading,

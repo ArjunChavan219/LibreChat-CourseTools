@@ -10,14 +10,15 @@ import { Nav, MobileNav } from '~/components/Nav';
 import TermsAndConditionsModal from '~/components/ui/TermsAndConditionsModal';
 
 export default function Root() {
-  const { isAuthenticated, logout, token } = useAuthContext();
+  const { isAuthenticated, logout, token, courseId } = useAuthContext();
+  const course = courseId || "1";
   const navigate = useNavigate();
   const [navVisible, setNavVisible] = useState(() => {
     const savedNavVisible = localStorage.getItem('navVisible');
     return savedNavVisible !== null ? JSON.parse(savedNavVisible) : true;
   });
 
-  const search = useSearch({ isAuthenticated });
+  const search = useSearch({ isAuthenticated, courseId: course});
   const fileMap = useFileMap({ isAuthenticated });
   const assistantsMap = useAssistantsMap({ isAuthenticated });
   const agentsMap = useAgentsMap({ isAuthenticated });

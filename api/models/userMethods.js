@@ -1,6 +1,10 @@
 const bcrypt = require('bcryptjs');
 const signPayload = require('~/server/services/signPayload');
 const User = require('./User');
+const Student = require('./Student')
+const Professor = require('./Professor')
+const { SystemRoles } = require('librechat-data-provider');
+const Course = require('./Course');
 
 /**
  * Retrieve a user by ID and convert the found user document to a plain object.
@@ -60,7 +64,7 @@ const updateUser = async function (userId, updateData) {
  * @returns {Promise<ObjectId>} A promise that resolves to the created user document ID.
  * @throws {Error} If a user with the same user_id already exists.
  */
-const createUser = async (data, disableTTL = true, returnUser = false) => {
+const createUser = async (data, courseId, disableTTL = true, returnUser = false) => {
   const userData = {
     ...data,
     expiresAt: disableTTL ? null : new Date(Date.now() + 604800 * 1000), // 1 week in milliseconds
@@ -70,12 +74,59 @@ const createUser = async (data, disableTTL = true, returnUser = false) => {
     delete userData.expiresAt;
   }
 
+  let profile;
+  
+  if (userData.role === SystemRoles.USER) {
+    if (courseId) {
+      const course = await Course.findOne({ id: courseId });
+      if (!course) {
+        return res.status(404).json({ message: 'Course not found' });
+      }
+      
+      userData.profileRole = "Student";
+      profile = await Student.create({
+        userId: "000000000000000000000000",
+        courses: [courseId],
+        taCourses: [],
+        role: 'Student',
+      });
+      course.students.push(profile._id);
+      
+      await course.save();
+    }
+  } else if (userData.role === SystemRoles.ADMIN) {
+    userData.profileRole = "Professor";
+    profile = await Professor.create({
+      userId: "000000000000000000000000",
+      courses: [],
+    });
+  }
+
+  if (!profile) {
+    throw new Error('Failed to create profile for the user');
+  }
+
+  // Set the `profileId` in User and `userId` in Student/Professor
+  userData.profileId = profile._id;
   const user = await User.create(userData);
+
+  if (!user) {
+    throw new Error('Failed to create user');
+  }
+
+  // Update the `userId` in Student/Professor
+  if (userData.role === SystemRoles.USER) {
+    await Student.findByIdAndUpdate(profile._id, { userId: user._id });
+  } else {
+    await Professor.findByIdAndUpdate(profile._id, { userId: user._id });
+  }
+
   if (returnUser) {
     return user.toObject();
   }
   return user._id;
 };
+
 
 /**
  * Count the number of user documents in the collection based on the provided filter.

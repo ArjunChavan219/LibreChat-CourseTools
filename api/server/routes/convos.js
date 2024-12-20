@@ -16,8 +16,11 @@ const router = express.Router();
 router.use(requireJwtAuth);
 
 router.get('/', async (req, res) => {
+  let userId = req.query.studentId || req.user.id;
+  
   let pageNumber = req.query.pageNumber || 1;
   pageNumber = parseInt(pageNumber, 10);
+  let courseId = req.query.courseId;  
 
   if (isNaN(pageNumber) || pageNumber < 1) {
     return res.status(400).json({ error: 'Invalid page number' });
@@ -36,8 +39,8 @@ router.get('/', async (req, res) => {
   } else {
     tags = undefined;
   }
-
-  res.status(200).send(await getConvosByPage(req.user.id, pageNumber, pageSize, isArchived, tags));
+  
+  res.status(200).send(await getConvosByPage(userId, courseId, pageNumber, pageSize, isArchived, tags));
 });
 
 router.get('/:conversationId', async (req, res) => {
@@ -108,7 +111,6 @@ router.post('/clear', async (req, res) => {
 
 router.post('/update', async (req, res) => {
   const update = req.body.arg;
-
   try {
     const dbResponse = await saveConvo(req, update, { context: 'POST /api/convos/update' });
     res.status(201).json(dbResponse);
